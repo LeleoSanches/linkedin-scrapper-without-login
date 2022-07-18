@@ -107,8 +107,10 @@ class Extractor(object):
     
     def extract_experience(self):
         exp = self.soup.find('section',"core-section-container my-3 core-section-container--with-border border-b-1 border-solid border-color-border-faint m-0 py-3 pp-section experience")
-        exp = exp.findAll(['h3','h4','span'], {"class":["profile-section-card__title","profile-section-card__subtitle","date-range"]})
-
+        try:
+            exp = exp.findAll(['h3','h4','span'], {"class":["profile-section-card__title","profile-section-card__subtitle","date-range"]})
+        except:
+            exp = []
         bag = []
         n = 0
         d = {}
@@ -135,7 +137,10 @@ class Extractor(object):
                 
     def extract_academics(self):
         academics = self.soup.find('section', "core-section-container my-3 core-section-container--with-border border-b-1 border-solid border-color-border-faint m-0 py-3 pp-section education")
-        academics = academics.findAll(['h3','h4','p'],{"class":["profile-section-card__title","profile-section-card__subtitle","education__item education__item--duration"]})
+        try:
+            academics = academics.findAll(['h3','h4','p'],{"class":["profile-section-card__title","profile-section-card__subtitle","education__item education__item--duration"]})
+        except:
+            academics = []
         d = {}
         bag = []
         n = 0
@@ -156,6 +161,30 @@ class Extractor(object):
         }
         return acad
     
+    def extract_languages(self):
+        lang = self.soup.find('section',"core-section-container my-3 core-section-container--with-border border-b-1 border-solid border-color-border-faint m-0 py-3 pp-section languages")
+        try:
+            lang = lang.findAll(['h3','h4'],{"class":["profile-section-card__title","profile-section-card__subtitle"]})
+        except:
+            lang = []
+        d = {}
+        bag = []
+        n = 0
+        for i in lang:
+            languages = " ".join(i.text.split())
+            if i.name == 'h3':
+                d['language'] = languages
+            elif i.name == 'h4':
+                d['proficiency'] = languages
+            n += 1
+            if n % 2 == 0:
+                bag.append(d)
+                d = {}
+        language = {
+            'languages':bag
+        }
+        print(language)
+        return language
 
 
 def load_data(path):
@@ -202,10 +231,12 @@ for i in profile_list['link']:
     aboutme = main.extract_about_me()
     experience = main.extract_experience()
     academics = main.extract_academics()
+    language = main.extract_languages()
 
     main_info.update(aboutme)
     main_info.update(experience)
     main_info.update(academics)
+    main_info.update(language)
     #Save JSON response
     with open(f"{profile}.json", "w") as outfile:
         json.dump(main_info, outfile, ensure_ascii=False)
