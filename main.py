@@ -107,7 +107,7 @@ class Extractor(object):
     
     def extract_experience(self):
         exp = self.soup.find('section',"core-section-container my-3 core-section-container--with-border border-b-1 border-solid border-color-border-faint m-0 py-3 pp-section experience")
-        exp = exp.findAll(['h3','h4','span','div','div'], {"class":["profile-section-card__title","profile-section-card__subtitle","date-range","experience-item__description experience-item__meta-item","experience-group-position__description experience-group-position__meta-item"]})
+        exp = exp.findAll(['h3','h4','span'], {"class":["profile-section-card__title","profile-section-card__subtitle","date-range"]})
 
         bag = []
         n = 0
@@ -135,7 +135,7 @@ class Extractor(object):
                 
     def extract_academics(self):
         academics = self.soup.find('section', "core-section-container my-3 core-section-container--with-border border-b-1 border-solid border-color-border-faint m-0 py-3 pp-section education")
-        academics = academics.findAll(['h3','h4','p', 'div'],{"class":["profile-section-card__title","profile-section-card__subtitle","education__item education__item--duration","education__item--details"]})
+        academics = academics.findAll(['h3','h4','p'],{"class":["profile-section-card__title","profile-section-card__subtitle","education__item education__item--duration"]})
         d = {}
         bag = []
         n = 1
