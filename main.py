@@ -181,9 +181,13 @@ for i in profile_list['link']:
     print(f"Perfil de: {profile}")
     #Access the page without login
     #linkedin.access_profile(f"https://www.linkedin.com/in/{profile}/?trk=public_profile_browsemap")
-    linkedin.access_profile(f"https://br.linkedin.com/in/{profile}/?trk=people-guest_people_search-card&original_referer=")
+    perfil = f"https://br.linkedin.com/in/{profile}/?trk=people-guest_people_search-card&original_referer="
+    linkedin.access_profile(perfil)
     sleep(3)
-    linkedin.access_profile(f"https://br.linkedin.com/in/{profile}/?trk=people-guest_people_search-card&original_referer=")
+    if perfil == driver.current_url:
+        pass
+    else:
+        linkedin.access_profile(perfil)
     linkedin.scroll_page()
 
 
