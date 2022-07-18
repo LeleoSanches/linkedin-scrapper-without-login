@@ -138,7 +138,7 @@ class Extractor(object):
         academics = academics.findAll(['h3','h4','p'],{"class":["profile-section-card__title","profile-section-card__subtitle","education__item education__item--duration"]})
         d = {}
         bag = []
-        n = 1
+        n = 0
         for i in academics:
             academic = " ".join(i.text.split())
             if i.name == "h3":
