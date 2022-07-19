@@ -249,6 +249,31 @@ class Extractor(object):
         }
         return language
 
+    def extract_certifications(self):
+        cert = self.soup.findAll('ul',"certifications__list")
+        bag = []
+        d = {}
+        n = 0
+        for i in cert:
+            certification = i.findAll(['h3','h4'],{'class':["profile-section-card__title","profile-section-card__subtitle"]})
+            for j in certification:
+                if j.name == 'h3':
+                    j = " ".join(j.text.split())
+                    d['certification'] = j
+                elif j.name == 'h4':
+                    j = " ".join(j.text.split())
+                    d['institution'] = j
+                n += 1
+                if n % 2 == 0:
+                    bag.append(d)
+                    d={}
+        certifications = {
+            'certifications':bag
+        }
+        return certifications
+
+
+
 
 def load_data(path):
     profile_list = pd.read_csv(path)
@@ -295,11 +320,13 @@ for i in profile_list['link']:
     experience = main.extract_experience()
     academics = main.extract_academics()
     language = main.extract_languages()
+    certification = main.extract_certifications()
 
     main_info.update(aboutme)
     main_info.update(experience)
     main_info.update(academics)
     main_info.update(language)
+    main_info.update(certification)
     #Save JSON response
     with open(f"{profile}.json", "w") as outfile:
         json.dump(main_info, outfile, ensure_ascii=False)
