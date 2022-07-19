@@ -13,11 +13,11 @@ class Scrapper(object):
 
     def __init__(self):
         #Open firefox webdriver
-        #options = Options()
-        #options.headless = True
-        #self.driver = webdriver.Firefox(options=options)
-        self.driver = webdriver.Firefox()
-        self.driver.maximize_window()
+        options = Options()
+        options.headless = True
+        self.driver = webdriver.Firefox(options=options)
+        #self.driver = webdriver.Firefox()
+        #self.driver.maximize_window()
         sleep(random.randint(1,6))
 
     def return_driver(self):
@@ -106,33 +106,97 @@ class Extractor(object):
         return d
     
     def extract_experience(self):
-        exp = self.soup.find('section',"core-section-container my-3 core-section-container--with-border border-b-1 border-solid border-color-border-faint m-0 py-3 pp-section experience")
-        try:
-            exp = exp.findAll(['h3','h4','span'], {"class":["profile-section-card__title","profile-section-card__subtitle","date-range"]})
-        except:
-            exp = []
+        exp = self.soup.findAll('li',"profile-section-card experience-item")
+        #a = soup.findAll('ul',"experience__list" )
         bag = []
-        n = 0
-        d = {}
         for i in exp:
-            b = " ".join(i.text.split())
+            try:
+                title = i.find('h3',"profile-section-card__title")
+                title = " ".join(title.text.split())
+            except:
+                title = ""
+            try:
+                local = i.find('h4',"profile-section-card__subtitle")
+                local = " ".join(local.text.split())
+            except:
+                local = ""
+            try:
+                #data = i.find('span',"date-range")
+                data = i.findAll("time")
+                start_date = data[0]
+                end_date = data[1]
+                start_date = " ".join(start_date.text.split())
+                end_date = " ".join(end_date.text.split())
+            except:
+                start_date = ""
+                end_date = ""
+            try:
+                des = i.find('div', "experience-item__description experience-item__meta-item")
+                des = " ".join(des.text.split())
+            except:
+                des = ""
+            try:
+                #city = i.find('p',"experience-group-position__duration experience-group-position__meta-item")
+                city = i.find('p',"experience-group-position__location experience-group-position__meta-item")
+                city = " ".join(city.text.split())
+            except:
+                city = ""
+            d = {
+                "title":title,
+                "local":local,
+                "start_date":start_date,
+                "end_date":end_date,
+                "city":city,
+                "description":des
+            }
+            bag.append(d)
 
-            if i.name == "h3":
-                d['title'] = b
-            elif i.name == "h4":
-                d['local'] = b
-            #elif exp[i].name == 'div':
-                #dis = b
-            elif i.name == 'span':
-                d['data'] = b
-            n += 1
-            if n % 3 == 0:
+        exp_grouped = self.soup.findAll('li',"experience-group experience-item")
+
+        for i in exp_grouped:
+            exp_group = i.findAll('li',"profile-section-card experience-group-position")
+            for j in exp_group:
+                try:
+                    title = j.find('h3',"profile-section-card__title")
+                    title = " ".join(title.text.split())
+                except:
+                    title = ""
+                try:
+                    local = j.find('h4',"profile-section-card__subtitle")
+                    local = " ".join(local.text.split())
+                except:
+                    local = ""
+                try:
+                    data = i.findAll("time")
+                    start_date = data[0]
+                    end_date = data[1]
+                    start_date = " ".join(start_date.text.split())
+                    end_date = " ".join(end_date.text.split())
+                except:
+                    start_date = ""
+                    end_date = ""
+                try:
+                    des = j.find('div', "experience-group-position__description experience-group-position__meta-item" )
+                    des = " ".join(des.text.split())
+                except:
+                    des = ""
+                try:
+                    city = j.find('p',"experience-group-position__location experience-group-position__meta-item")
+                    city = " ".join(city.text.split())
+                except:
+                    city = ""
+                d = {
+                    "title":title,
+                    "local":local,
+                    "start_date":start_date,
+                    "end_date":end_date,
+                    "city":city,
+                    "description":des
+                }
                 bag.append(d)
-                d = {}
         experience = {
-            'experience':bag
+            "experience":bag
         }
-
         return experience
                 
     def extract_academics(self):
@@ -183,7 +247,6 @@ class Extractor(object):
         language = {
             'languages':bag
         }
-        print(language)
         return language
 
 
@@ -199,7 +262,7 @@ driver = linkedin.return_driver()
 profile_list = load_data('data.csv')
 for i in profile_list['link']:
     #Switch to new tab
-    start_time = datetime.now()
+    #start_time = datetime.now()
     driver.execute_script("window.open('');")
     driver.switch_to.window(driver.window_handles[1])
 
@@ -207,7 +270,7 @@ for i in profile_list['link']:
 
     #Complete link as https:www.linkedin.com/in/name (comment this line if you have just the profile name)
     profile = i.split('/')[2]
-    print(f"Perfil de: {profile}")
+    #print(f"Perfil de: {profile}")
     #Access the page without login
     #linkedin.access_profile(f"https://www.linkedin.com/in/{profile}/?trk=public_profile_browsemap")
     perfil = f"https://br.linkedin.com/in/{profile}/?trk=people-guest_people_search-card&original_referer="
@@ -241,6 +304,6 @@ for i in profile_list['link']:
     with open(f"{profile}.json", "w") as outfile:
         json.dump(main_info, outfile, ensure_ascii=False)
 
-    end_time = datetime.now()
-    print("Duração: {}".format(end_time - start_time))
-    print(60*"*")
+    #end_time = datetime.now()
+    #print("Duração: {}".format(end_time - start_time))
+    #print(60*"*")
