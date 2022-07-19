@@ -68,7 +68,7 @@ class Extractor(object):
         except:
             activity = ""
         try:
-            region = self.soup.find('h3', 'top-card-layout__first-subline font-sans text-md leading-open text-color-text-low-emphasis')
+            region = self.soup.find('h3', 'top-card-layout__first-subline font-sans text-md leading-open text-color-text-low-emphasis').find('span',"top-card__subline-item")
             if len(region.text.split(',')) == 3:
                 cidade = " ".join(region.text.split()).split(',')[0]
                 estado = " ".join(region.text.split()).split(',')[1]
